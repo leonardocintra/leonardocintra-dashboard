@@ -2,6 +2,11 @@
   "name": "leonardocintra-dashboard",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Leonardo Nascimento Cintra",
+    "email": "leonardo.ncintra@outlook.com",
+    "url": "https://leonardocintra.com.br"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
