@@ -24,6 +24,16 @@ export function SiteHeader() {
               GitHub
             </Link>
           </Button>
+          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
+            <Link
+              href="https://leonardocintra.com.br"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="dark:text-foreground"
+            >
+              Site Pessoal
+            </Link>
+          </Button>
         </div>
       </div>
     </header>
