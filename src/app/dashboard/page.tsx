@@ -1,10 +1,22 @@
-export default function DashboardHome() {
+import type { MensagemExterna } from "@/lib/api/mensagem-externa";
+import { fetchMensagemExterna } from "@/lib/api/mensagem-externa";
+
+import { MensagensClientView } from "./mensagens-client-view";
+
+export default async function DashboardHome() {
+  let messages: MensagemExterna[] = [];
+
+  try {
+    messages = await fetchMensagemExterna("pending");
+  } catch {
+    // Graceful degradation: render empty table if upstream is down
+    messages = [];
+  }
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Welcome to the Dashboard</h1>
-      <p className="mt-4 text-lg text-gray-600">
-        This is the main dashboard page for managing your projects and experiments.
-      </p>
+    <div className="space-y-4 p-6">
+      <h1 className="text-2xl font-bold tracking-tight">Mensagens Externas</h1>
+      <MensagensClientView initialMessages={messages} />
     </div>
   );
 }
