@@ -62,8 +62,8 @@ export function MensagemExternaTable({
                     title={message.message}
                     className="block truncate"
                   >
-                    {message.message.length > 100
-                      ? `${message.message.slice(0, 100)}…`
+                    {[...message.message].length > 100
+                      ? `${[...message.message].slice(0, 100).join("")}…`
                       : message.message}
                   </span>
                 </TableCell>
