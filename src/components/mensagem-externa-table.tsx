@@ -19,14 +19,16 @@ export function MensagemExternaTable({
   messages: MensagemExterna[];
 }) {
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="w-full rounded-md border">
+      <Table className="table-fixed">
         <TableHeader>
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
-            <TableHead className="w-37.5">Origem</TableHead>
-            <TableHead className="w-30">Status</TableHead>
-            <TableHead>Mensagem</TableHead>
+            <TableHead className="w-40">Origem</TableHead>
+            <TableHead className="w-28">Status</TableHead>
+            <TableHead className="w-[calc(100%-13rem)] overflow-hidden">
+              Mensagem
+            </TableHead>
             <TableHead className="w-20 text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -43,11 +45,20 @@ export function MensagemExternaTable({
           ) : (
             messages.map((message) => (
               <TableRow key={message.id}>
-                <TableCell className="font-medium">{message.id}</TableCell>
-                <TableCell>{message.origem}</TableCell>
-                <TableCell className="capitalize">{message.status}</TableCell>
-                <TableCell className="max-w-md">
-                  <span title={message.message}>
+                <TableCell className="max-w-0 truncate font-medium">
+                  {message.id}
+                </TableCell>
+                <TableCell className="max-w-0 truncate">
+                  {message.origem}
+                </TableCell>
+                <TableCell className="max-w-0 truncate capitalize">
+                  {message.status}
+                </TableCell>
+                <TableCell className="max-w-0">
+                  <span
+                    title={message.message}
+                    className="block truncate"
+                  >
                     {message.message.length > 100
                       ? `${message.message.slice(0, 100)}…`
                       : message.message}
