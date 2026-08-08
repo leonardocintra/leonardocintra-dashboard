@@ -35,3 +35,29 @@ export async function fetchMensagemExterna(
 
   return (await response.json()) as MensagemExterna[];
 }
+
+export async function fetchMensagemExternaById(
+  id: number | string,
+): Promise<MensagemExterna> {
+  const baseUrl = process.env.LEONARDO_API_URL;
+
+  if (!baseUrl) {
+    throw new Error(
+      "LEONARDO_API_URL environment variable is not set. Configure it in .env.local",
+    );
+  }
+
+  const url = `${baseUrl.replace(/\/+$/, "")}/afiliados/mensagem-externa/${id}`;
+
+  const response = await fetch(url, {
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Upstream API returned ${response.status}: ${response.statusText}`,
+    );
+  }
+
+  return (await response.json()) as MensagemExterna;
+}

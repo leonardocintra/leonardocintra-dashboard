@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,8 @@ export function MensagemExternaTable({
 }: {
   messages: MensagemExterna[];
 }) {
+  const router = useRouter();
+
   return (
     <div className="w-full rounded-md border">
       <Table className="table-fixed">
@@ -68,10 +71,10 @@ export function MensagemExternaTable({
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Editar"
-                    onClick={() => {
-                      // Edit action stub — to be wired later
-                    }}
+                    aria-label="Ver detalhes"
+                    onClick={() =>
+                      router.push(`/dashboard/mensagens/${message.id}`)
+                    }
                   >
                     <Pencil className="size-4" />
                   </Button>
