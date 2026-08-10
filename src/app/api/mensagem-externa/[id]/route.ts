@@ -1,3 +1,5 @@
+import { revalidatePath } from "next/cache";
+
 import {
   ALLOWED_STATUSES,
   deleteMensagemExterna,
@@ -92,6 +94,7 @@ export async function PATCH(
       status: body.status as MensagemExternaStatus,
       message: body.message,
     });
+    revalidatePath("/dashboard");
     return Response.json(updated, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -136,6 +139,8 @@ export async function DELETE(
 
   try {
     await deleteMensagemExterna(id);
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/mensagens", "page");
     return new Response(null, { status: 204 });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

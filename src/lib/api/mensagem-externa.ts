@@ -25,6 +25,7 @@ export async function fetchMensagemExterna(
 
   const response = await fetch(url, {
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
 
   if (!response.ok) {
@@ -51,6 +52,7 @@ export async function fetchMensagemExternaById(
 
   const response = await fetch(url, {
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
 
   if (!response.ok) {
@@ -82,6 +84,7 @@ export async function updateMensagemExterna(
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+    cache: "no-store",
     body: JSON.stringify(data),
   });
 
@@ -110,6 +113,7 @@ export async function deleteMensagemExterna(
   const response = await fetch(url, {
     method: "DELETE",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
 
   if (!response.ok) {

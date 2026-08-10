@@ -13,7 +13,7 @@ export default async function MensagemDetalhePage({
 }) {
   const { id } = await params;
 
-  let mensagem;
+  let mensagem: any;
   try {
     mensagem = await fetchMensagemExternaById(id);
   } catch {
