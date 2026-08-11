@@ -54,7 +54,7 @@ export function MensagensClientView({
           disabled={loading}
         >
           <option value="pending">Pending</option>
-          <option value="editing">Editing</option>
+          <option value="ok">OK</option>
         </select>
         {loading && (
           <span className="text-sm text-muted-foreground">Carregando...</span>

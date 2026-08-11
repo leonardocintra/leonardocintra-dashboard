@@ -3,12 +3,12 @@ export type MensagemExterna = {
   origem: string;
   message: string;
   createdAt: string;
-  status: "pending" | "editing";
+  status: "pending" | "ok";
 };
 
-export type MensagemExternaStatus = "pending" | "editing";
+export type MensagemExternaStatus = "pending" | "ok";
 
-export const ALLOWED_STATUSES: MensagemExternaStatus[] = ["pending", "editing"];
+export const ALLOWED_STATUSES: MensagemExternaStatus[] = ["pending", "ok"];
 
 export async function fetchMensagemExterna(
   status: MensagemExternaStatus,

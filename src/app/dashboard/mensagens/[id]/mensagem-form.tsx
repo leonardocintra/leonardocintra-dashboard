@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Copy } from "lucide-react";
 
 import type { MensagemExterna } from "@/lib/api/mensagem-externa";
+import Link from "next/link";
 
 const LINK_REGEX = /https?:\/\/[^\s<>"']+/g;
 
@@ -76,7 +77,7 @@ export function MensagemForm({
   };
 
   return (
-    <Card>
+    <Card className="w-full max-w-4xl">
       <CardHeader>
         <CardTitle>Detalhes da Mensagem</CardTitle>
       </CardHeader>
@@ -109,7 +110,7 @@ export function MensagemForm({
               className="h-9 w-full min-w-0 rounded-3xl border border-transparent bg-input/50 px-3 py-1 text-base outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 md:text-sm"
             >
               <option value="pending">Pending</option>
-              <option value="editing">Editing</option>
+              <option value="ok">OK</option>
             </select>
           </div>
         </div>
@@ -120,7 +121,7 @@ export function MensagemForm({
             id="message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            rows={6}
+            rows={12}
             className="w-full rounded-3xl border border-transparent bg-input/50 px-3 py-2 text-sm outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
           />
           {links.length > 0 && (
@@ -134,14 +135,14 @@ export function MensagemForm({
                     key={index}
                     className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                   >
-                    <a
+                    <Link
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="truncate text-primary underline-offset-4 hover:underline"
                     >
                       {url}
-                    </a>
+                    </Link>
                     <Button
                       variant="ghost"
                       size="icon-sm"
@@ -154,6 +155,19 @@ export function MensagemForm({
                         <Copy className="size-3.5" />
                       )}
                     </Button>
+                    <Input
+                      type="url"
+                      placeholder="Substituir por outro link..."
+                      className="h-8 flex-1"
+                      onBlur={(e) => {
+                        const newUrl = e.target.value.trim();
+                        if (newUrl && newUrl !== url) {
+                          setMessage((prev) =>
+                            prev.replace(url, newUrl),
+                          );
+                        }
+                      }}
+                    />
                   </li>
                 ))}
               </ul>

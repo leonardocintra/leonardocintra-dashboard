@@ -27,8 +27,6 @@ export function MensagemExternaTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
-            <TableHead className="w-40">Origem</TableHead>
-            <TableHead className="w-28">Status</TableHead>
             <TableHead className="w-[calc(100%-13rem)] overflow-hidden">
               Mensagem
             </TableHead>
@@ -50,12 +48,6 @@ export function MensagemExternaTable({
               <TableRow key={message.id}>
                 <TableCell className="max-w-0 truncate font-medium">
                   {message.id}
-                </TableCell>
-                <TableCell className="max-w-0 truncate">
-                  {message.origem}
-                </TableCell>
-                <TableCell className="max-w-0 truncate capitalize">
-                  {message.status}
                 </TableCell>
                 <TableCell className="max-w-0">
                   <span
