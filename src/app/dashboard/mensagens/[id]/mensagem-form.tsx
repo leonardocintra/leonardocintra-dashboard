@@ -31,13 +31,15 @@ export function MensagemForm({
   const [message, setMessage] = useState(mensagem.message);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [copiedUrl, setCopiedUrl] = useState<number | null>(null);
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+  const fixedLink = "https://www.aviseiprecobom.com.br";
 
   const links = [...message.matchAll(LINK_REGEX)].map((m) => m[0]);
 
-  const handleCopy = async (url: string, index: number) => {
+  const handleCopy = async (url: string) => {
     await navigator.clipboard.writeText(url);
-    setCopiedUrl(index);
+    setCopiedUrl(url);
     setTimeout(() => setCopiedUrl(null), 2000);
   };
 
@@ -147,9 +149,9 @@ export function MensagemForm({
                       variant="ghost"
                       size="icon-sm"
                       aria-label="Copiar link"
-                      onClick={() => handleCopy(url, index)}
+                      onClick={() => handleCopy(url)}
                     >
-                      {copiedUrl === index ? (
+                      {copiedUrl === url ? (
                         <span className="text-xs text-green-500">Copiado!</span>
                       ) : (
                         <Copy className="size-3.5" />
@@ -190,6 +192,34 @@ export function MensagemForm({
           >
             {deleting ? "Deletando..." : "Deletar"}
           </Button>
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <span className="text-sm font-medium text-muted-foreground">
+            Link pre definido
+          </span>
+          <div className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
+            <Link
+              href={fixedLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="truncate text-primary underline-offset-4 hover:underline"
+            >
+              {fixedLink}
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Copiar link"
+              onClick={() => handleCopy(fixedLink)}
+            >
+              {copiedUrl === fixedLink ? (
+                <span className="text-xs text-green-500">Copiado!</span>
+              ) : (
+                <Copy className="size-3.5" />
+              )}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
