@@ -1,30 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Copy } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import { Copy } from "lucide-react";
-
 import type { MensagemExterna } from "@/lib/api/mensagem-externa";
-import Link from "next/link";
 
 const LINK_REGEX = /https?:\/\/[^\s<>"']+/g;
 
-export function MensagemForm({
-  mensagem,
-}: {
-  mensagem: MensagemExterna;
-}) {
+export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
   const router = useRouter();
   const [origem, setOrigem] = useState(mensagem.origem);
   const [status, setStatus] = useState(mensagem.status);
@@ -32,6 +20,12 @@ export function MensagemForm({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    mensagem.imageUrl ?? null,
+  );
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const fixedLink = "https://www.aviseiprecobom.com.br";
 
@@ -48,17 +42,85 @@ export function MensagemForm({
     timeStyle: "short",
   });
 
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0] ?? null;
+    setImageFile(file);
+    setUploadError(null);
+
+    if (!file) {
+      setImageUrl(mensagem.imageUrl ?? null);
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `/api/mensagem-externa/${mensagem.id}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(data.error ?? `Upload failed (${response.status})`);
+      }
+
+      const data = (await response.json()) as { imageUrl: string };
+      setImageUrl(data.imageUrl);
+    } catch (error) {
+      const messageText =
+        error instanceof Error ? error.message : String(error);
+      setUploadError(messageText);
+      setImageUrl(null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSave = async () => {
+    if (uploadError) {
+      return;
+    }
+    if (uploading) {
+      return;
+    }
+
     setSaving(true);
     try {
-      await fetch(`/api/mensagem-externa/${mensagem.id}`, {
+      const body: {
+        status: MensagemExterna["status"];
+        message: string;
+        imageUrl?: string;
+      } = { status, message };
+      if (imageUrl && imageUrl !== "") {
+        body.imageUrl = imageUrl;
+      }
+
+      const response = await fetch(`/api/mensagem-externa/${mensagem.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, message }),
+        body: JSON.stringify(body),
       });
+
+      if (!response.ok) {
+        throw new Error(`Save failed (${response.status})`);
+      }
+
       router.push("/dashboard");
-    } catch {
+    } catch (error) {
       setSaving(false);
+      const messageText =
+        error instanceof Error ? error.message : String(error);
+      setUploadError(messageText);
     }
   };
 
@@ -77,6 +139,9 @@ export function MensagemForm({
   const handleCancel = () => {
     router.push("/dashboard");
   };
+
+  const imagePreviewUrl =
+    imageFile && !uploadError ? URL.createObjectURL(imageFile) : null;
 
   return (
     <Card className="w-full max-w-4xl">
@@ -115,6 +180,39 @@ export function MensagemForm({
               <option value="ok">OK</option>
             </select>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="image">Imagem</Label>
+          <Input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            disabled={uploading}
+          />
+          {uploading && (
+            <p className="text-xs text-muted-foreground">Enviando imagem...</p>
+          )}
+          {uploadError && (
+            <p className="text-xs text-destructive">{uploadError}</p>
+          )}
+          {imagePreviewUrl && (
+            // biome-ignore lint/performance/noImgElement: preview uses local object URL
+            <img
+              src={imagePreviewUrl}
+              alt="Preview da imagem selecionada"
+              className="max-h-48 rounded-md border"
+            />
+          )}
+          {!imagePreviewUrl && imageUrl && !imageFile && (
+            // biome-ignore lint/performance/noImgElement: preview uses object URL or remote URL
+            <img
+              src={imageUrl}
+              alt="Imagem da mensagem"
+              className="max-h-48 rounded-md border"
+            />
+          )}
         </div>
 
         <div className="space-y-2">
@@ -164,9 +262,7 @@ export function MensagemForm({
                       onBlur={(e) => {
                         const newUrl = e.target.value.trim();
                         if (newUrl && newUrl !== url) {
-                          setMessage((prev) =>
-                            prev.replace(url, newUrl),
-                          );
+                          setMessage((prev) => prev.replace(url, newUrl));
                         }
                       }}
                     />
@@ -181,7 +277,10 @@ export function MensagemForm({
           <Button variant="outline" onClick={handleCancel}>
             Cancelar
           </Button>
-          <Button onClick={handleSave} disabled={saving}>
+          <Button
+            onClick={handleSave}
+            disabled={saving || uploading || !!uploadError}
+          >
             {saving ? "Salvando..." : "Salvar"}
           </Button>
           <Button

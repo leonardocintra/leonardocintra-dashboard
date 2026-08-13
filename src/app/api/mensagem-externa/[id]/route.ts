@@ -65,14 +65,11 @@ export async function PATCH(
     );
   }
 
-  let body: { status?: string; message?: string };
+  let body: { status?: string; message?: string; imageUrl?: string };
   try {
     body = await request.json();
   } catch {
-    return Response.json(
-      { error: "Invalid JSON body" },
-      { status: 400 },
-    );
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   if (!body.status || body.message === undefined) {
@@ -93,6 +90,9 @@ export async function PATCH(
     const updated = await updateMensagemExterna(id, {
       status: body.status as MensagemExternaStatus,
       message: body.message,
+      ...(body.imageUrl !== undefined && body.imageUrl !== ""
+        ? { imageUrl: body.imageUrl }
+        : {}),
     });
     revalidatePath("/dashboard");
     return Response.json(updated, { status: 200 });

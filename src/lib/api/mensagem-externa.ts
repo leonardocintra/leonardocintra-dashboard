@@ -4,6 +4,7 @@ export type MensagemExterna = {
   message: string;
   createdAt: string;
   status: "pending" | "ok";
+  imageUrl?: string;
 };
 
 export type MensagemExternaStatus = "pending" | "ok";
@@ -66,7 +67,11 @@ export async function fetchMensagemExternaById(
 
 export async function updateMensagemExterna(
   id: number | string,
-  data: { status: MensagemExternaStatus; message: string },
+  data: {
+    status: MensagemExternaStatus;
+    message: string;
+    imageUrl?: string;
+  },
 ): Promise<MensagemExterna> {
   const baseUrl = process.env.LEONARDO_API_URL;
 
@@ -78,6 +83,19 @@ export async function updateMensagemExterna(
 
   const url = `${baseUrl.replace(/\/+$/, "")}/afiliados/mensagem-externa/${id}`;
 
+  // Empty imageUrl is treated as absent — see spec scenario "imageUrl empty string treated as absent"
+  const body: {
+    status: MensagemExternaStatus;
+    message: string;
+    imageUrl?: string;
+  } = {
+    status: data.status,
+    message: data.message,
+  };
+  if (data.imageUrl !== undefined && data.imageUrl !== "") {
+    body.imageUrl = data.imageUrl;
+  }
+
   const response = await fetch(url, {
     method: "PATCH",
     headers: {
@@ -85,7 +103,7 @@ export async function updateMensagemExterna(
       "Content-Type": "application/json",
     },
     cache: "no-store",
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
