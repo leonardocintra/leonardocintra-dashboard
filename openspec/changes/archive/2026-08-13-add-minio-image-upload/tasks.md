@@ -44,7 +44,7 @@
 
 ## 7. Validation
 
-- [ ] 7.1 Run `npx tsc --noEmit` to verify no type errors across changed files (`src/lib/minio.ts`, `src/lib/api/mensagem-externa.ts`, `src/app/api/mensagem-externa/[id]/route.ts`, `src/app/api/mensagem-externa/[id]/upload/route.ts`, `src/app/dashboard/mensagens/[id]/mensagem-form.tsx`)
-- [ ] 7.2 Run `npm run build` (or `npm run lint` if build is unavailable) and ensure exit code 0
+- [x] 7.1 Run `npx tsc --noEmit` to verify no type errors across changed files (`src/lib/minio.ts`, `src/lib/api/mensagem-externa.ts`, `src/app/api/mensagem-externa/[id]/route.ts`, `src/app/api/mensagem-externa/[id]/upload/route.ts`, `src/app/dashboard/mensagens/[id]/mensagem-form.tsx`) — verified 2026-08-13: exit 0
+- [x] 7.2 Run `npm run build` (or `npm run lint` if build is unavailable) and ensure exit code 0 — verified 2026-08-13: Next.js 16.3.0 Turbopack build succeeded
 - [ ] 7.3 Manually verify with a local MinIO instance: upload an image via the form, confirm `imageUrl` is returned, and PATCH saves successfully with `imageUrl` populated
 - [ ] 7.4 Verify the "no image" path: save a message without selecting an image — PATCH succeeds without `imageUrl`

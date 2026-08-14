@@ -24,6 +24,9 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
   const [imageUrl, setImageUrl] = useState<string | null>(
     mensagem.imageUrl ?? null,
   );
+  const [imageName, setImageName] = useState<string | null>(
+    mensagem.imageName ?? null,
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -74,8 +77,9 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
         throw new Error(data.error ?? `Upload failed (${response.status})`);
       }
 
-      const data = (await response.json()) as { imageUrl: string };
+      const data = (await response.json()) as { imageUrl: string, imageName: string };
       setImageUrl(data.imageUrl);
+      setImageName(data.imageName);
     } catch (error) {
       const messageText =
         error instanceof Error ? error.message : String(error);
@@ -100,9 +104,13 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
         status: MensagemExterna["status"];
         message: string;
         imageUrl?: string;
+        imageName?: string;
       } = { status, message };
       if (imageUrl && imageUrl !== "") {
         body.imageUrl = imageUrl;
+      }
+      if (imageName && imageName !== "") {
+        body.imageName = imageName;
       }
 
       const response = await fetch(`/api/mensagem-externa/${mensagem.id}`, {

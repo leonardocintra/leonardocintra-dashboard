@@ -19,8 +19,10 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton className="data-[slot=sidebar-menu-button]:p-1.5!">
               <Link href="/dashboard">
-                <BotIcon className="size-5!" />
-                <span className="text-base font-semibold">Leonardo Cintra</span>
+                <div className="flex items-center gap-2">
+                  <BotIcon className="size-5!" />
+                  <span className="text-base font-semibold">Leonardo Cintra</span>
+                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

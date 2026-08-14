@@ -5,6 +5,7 @@ export type MensagemExterna = {
   createdAt: string;
   status: "pending" | "ok";
   imageUrl?: string;
+  imageName?: string;
 };
 
 export type MensagemExternaStatus = "pending" | "ok";
@@ -71,6 +72,7 @@ export async function updateMensagemExterna(
     status: MensagemExternaStatus;
     message: string;
     imageUrl?: string;
+    imageName?: string;
   },
 ): Promise<MensagemExterna> {
   const baseUrl = process.env.LEONARDO_API_URL;
@@ -88,12 +90,16 @@ export async function updateMensagemExterna(
     status: MensagemExternaStatus;
     message: string;
     imageUrl?: string;
+    imageName?: string;
   } = {
     status: data.status,
     message: data.message,
   };
   if (data.imageUrl !== undefined && data.imageUrl !== "") {
     body.imageUrl = data.imageUrl;
+  }
+  if (data.imageName !== undefined && data.imageName !== "") {
+    body.imageName = data.imageName;
   }
 
   const response = await fetch(url, {

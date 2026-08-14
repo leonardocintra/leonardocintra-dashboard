@@ -120,6 +120,7 @@ export async function POST(
 
   const protocol = config.useSSL ? "https" : "http";
   const imageUrl = `${protocol}://${config.endPoint}:${config.port}/${config.bucket}/${filename}`;
+  const imageName = filename;
 
-  return Response.json({ imageUrl }, { status: 200 });
+  return Response.json({ imageUrl, imageName }, { status: 201 });
 }

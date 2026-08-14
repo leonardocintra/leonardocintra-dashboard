@@ -65,7 +65,7 @@ export async function PATCH(
     );
   }
 
-  let body: { status?: string; message?: string; imageUrl?: string };
+  let body: { status?: string; message?: string; imageUrl?: string; imageName?: string };
   try {
     body = await request.json();
   } catch {
@@ -81,7 +81,7 @@ export async function PATCH(
 
   if (!ALLOWED_STATUSES.includes(body.status as MensagemExternaStatus)) {
     return Response.json(
-      { error: "Invalid status. Allowed values: pending, editing" },
+      { error: "Invalid status. Allowed values: pending, ok" },
       { status: 400 },
     );
   }
@@ -92,6 +92,9 @@ export async function PATCH(
       message: body.message,
       ...(body.imageUrl !== undefined && body.imageUrl !== ""
         ? { imageUrl: body.imageUrl }
+        : {}),
+      ...(body.imageName !== undefined && body.imageName !== ""
+        ? { imageName: body.imageName }
         : {}),
     });
     revalidatePath("/dashboard");
