@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MensagemExternaTable } from "@/components/mensagem-externa-table";
+import { Progress } from "@/components/ui/progress";
 import type {
   MensagemExterna,
   MensagemExternaStatus,
@@ -15,12 +16,13 @@ export function MensagensClientView({
 }) {
   const [status, setStatus] = useState<MensagemExternaStatus>("pending");
   const [messages, setMessages] = useState<MensagemExterna[]>(initialMessages);
-  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleStatusChange = useCallback(
     async (newStatus: MensagemExternaStatus) => {
       setStatus(newStatus);
-      setLoading(true);
+      setProgress(0);
       try {
         const res = await fetch(`/api/mensagem-externa?status=${newStatus}`);
         if (res.ok) {
@@ -31,12 +33,38 @@ export function MensagensClientView({
         }
       } catch {
         setMessages([]);
-      } finally {
-        setLoading(false);
       }
     },
     [],
   );
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) return 0;
+        return prev + 10;
+      });
+      fetch(`/api/mensagem-externa?status=${status}`)
+        .then((res) => {
+          if (res.ok) {
+            return res.json() as Promise<MensagemExterna[]>;
+          }
+          return [];
+        })
+        .then((data) => {
+          setMessages(data);
+        })
+        .catch(() => {
+          setMessages([]);
+        });
+    }, 1000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [status]);
 
   return (
     <div className="space-y-4">
@@ -51,14 +79,11 @@ export function MensagensClientView({
             handleStatusChange(e.target.value as MensagemExternaStatus)
           }
           className="rounded-md border border-input bg-background px-3 py-1.5 text-sm"
-          disabled={loading}
         >
           <option value="pending">Pending</option>
           <option value="ok">OK</option>
         </select>
-        {loading && (
-          <span className="text-sm text-muted-foreground">Carregando...</span>
-        )}
+        <Progress value={progress} className="w-32" />
       </div>
       <MensagemExternaTable messages={messages} />
     </div>

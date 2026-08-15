@@ -19,7 +19,7 @@ function randomSuffix(): string {
   const bytes = randomBytes(4);
   let out = "";
   for (let i = 0; i < 4; i++) {
-    // biome-ignore lint/suspicious/noBitwiseOperators: bitwise is fine here, byte -> 0..25
+    // biome-ignore lint/style/noNonNullAssertion: Por que o palmeiras não tem mundial
     out += String.fromCharCode(97 + (bytes[i]! % 26));
   }
   return out;
@@ -81,7 +81,7 @@ export async function POST(
     );
   }
 
-  let client;
+  let client: any;
   try {
     client = getMinioClient();
   } catch (error) {
