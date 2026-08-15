@@ -30,7 +30,7 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const fixedLink = "https://www.aviseiprecobom.com.br";
+  const fixedLink = "https://aviseiprecobom.com.br";
 
   const links = [...message.matchAll(LINK_REGEX)].map((m) => m[0]);
 
