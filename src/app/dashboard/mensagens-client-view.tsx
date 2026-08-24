@@ -40,23 +40,7 @@ export function MensagensClientView({
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 0;
-        return prev + 10;
-      });
-      fetch(`/api/mensagem-externa?status=${status}`)
-        .then((res) => {
-          if (res.ok) {
-            return res.json() as Promise<MensagemExterna[]>;
-          }
-          return [];
-        })
-        .then((data) => {
-          setMessages(data);
-        })
-        .catch(() => {
-          setMessages([]);
-        });
+      setProgress((prev) => (prev >= 100 ? 0 : prev + 10));
     }, 1000);
 
     return () => {
@@ -64,7 +48,25 @@ export function MensagensClientView({
         clearInterval(intervalRef.current);
       }
     };
-  }, [status]);
+  }, []);
+
+  useEffect(() => {
+    if (progress !== 100) return;
+
+    fetch(`/api/mensagem-externa?status=${status}`)
+      .then((res) => {
+        if (res.ok) {
+          return res.json() as Promise<MensagemExterna[]>;
+        }
+        return [];
+      })
+      .then((data) => {
+        setMessages(data);
+      })
+      .catch(() => {
+        setMessages([]);
+      });
+  }, [progress, status]);
 
   return (
     <div className="space-y-4">
@@ -85,7 +87,12 @@ export function MensagensClientView({
         </select>
         <Progress value={progress} className="w-32" />
       </div>
-      <MensagemExternaTable messages={messages} />
+      <MensagemExternaTable
+        messages={messages}
+        onDeleted={(id) =>
+          setMessages((prev) => prev.filter((message) => message.id !== id))
+        }
+      />
     </div>
   );
 }
