@@ -147,10 +147,8 @@ export function MensagemExternaTable({
                     {message.id}
                   </TableCell>
                   <TableCell className="max-w-0">
-                    <span title={message.message} className="block truncate">
-                      {[...message.message].length > 100
-                        ? `${[...message.message].slice(0, 100).join("")}…`
-                        : message.message}
+                    <span className="block whitespace-pre-line">
+                      {message.message}
                     </span>
                   </TableCell>
                   <TableCell>
