@@ -91,6 +91,10 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
   };
 
   const handleSave = async () => {
+    if (!imageUrl) {
+      setUploadError("Imagem é obrigatória.");
+      return;
+    }
     if (uploadError) {
       return;
     }
@@ -191,7 +195,9 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="image">Imagem</Label>
+          <Label htmlFor="image">
+            Imagem <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="image"
             type="file"
@@ -287,7 +293,7 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={saving || uploading || !!uploadError}
+            disabled={saving || uploading || !!uploadError || !imageUrl}
           >
             {saving ? "Salvando..." : "Salvar"}
           </Button>

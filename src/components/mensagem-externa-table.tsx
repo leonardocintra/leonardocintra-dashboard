@@ -115,7 +115,8 @@ export function MensagemExternaTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-20">ID</TableHead>
-              <TableHead className="w-[calc(100%-8rem)] overflow-hidden">
+              <TableHead className="w-36">Data</TableHead>
+              <TableHead className="w-[calc(100%-14rem)] overflow-hidden">
                 Mensagem
               </TableHead>
               <TableHead className="w-12" />
@@ -125,7 +126,7 @@ export function MensagemExternaTable({
             {messages.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={3}
+                  colSpan={4}
                   className="text-center text-muted-foreground"
                 >
                   Nenhuma mensagem encontrada
@@ -145,6 +146,9 @@ export function MensagemExternaTable({
                 >
                   <TableCell className="max-w-0 truncate font-medium">
                     {message.id}
+                  </TableCell>
+                  <TableCell className="max-w-0 truncate">
+                    {new Date(message.createdAt).toLocaleString("pt-BR")}
                   </TableCell>
                   <TableCell className="max-w-0">
                     <span className="block whitespace-pre-line">
