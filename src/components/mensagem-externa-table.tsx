@@ -43,40 +43,44 @@ export function MensagemExternaTable({
     });
   }
 
+  async function deleteMessage(id: number) {
+    let deleted = false;
+    try {
+      const res = await fetch(`/api/mensagem-externa/${id}`, {
+        method: "DELETE",
+      });
+      deleted = res.ok;
+    } catch {
+      deleted = false;
+    }
+
+    if (!deleted) return;
+
+    setRemovingIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+    await new Promise((resolve) => setTimeout(resolve, ROW_FADE_MS));
+    onDeleted(id);
+    setRemovingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
   async function handleDelete() {
     if (deleting || selectedIds.size === 0) return;
     setDeleting(true);
 
     for (const id of [...selectedIds]) {
-      let deleted = false;
-      try {
-        const res = await fetch(`/api/mensagem-externa/${id}`, {
-          method: "DELETE",
-        });
-        deleted = res.ok;
-      } catch {
-        deleted = false;
-      }
-
-      if (!deleted) continue;
-
-      setRemovingIds((prev) => {
-        const next = new Set(prev);
-        next.add(id);
-        return next;
-      });
-      await new Promise((resolve) => setTimeout(resolve, ROW_FADE_MS));
-      onDeleted(id);
-      setRemovingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
+      await deleteMessage(id);
     }
 
     setDeleting(false);
@@ -116,10 +120,10 @@ export function MensagemExternaTable({
             <TableRow>
               <TableHead className="w-20">ID</TableHead>
               <TableHead className="w-36">Data</TableHead>
-              <TableHead className="w-[calc(100%-14rem)] overflow-hidden">
+              <TableHead className="w-[calc(100%-16rem)] overflow-hidden">
                 Mensagem
               </TableHead>
-              <TableHead className="w-12" />
+              <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -156,14 +160,27 @@ export function MensagemExternaTable({
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(message.id)}
-                      onCheckedChange={(checked) =>
-                        toggleSelection(message.id, checked)
-                      }
-                      onClick={(event) => event.stopPropagation()}
-                      aria-label={`Selecionar mensagem ${message.id}`}
-                    />
+                    <div className="flex items-center gap-1">
+                      <Checkbox
+                        checked={selectedIds.has(message.id)}
+                        onCheckedChange={(checked) =>
+                          toggleSelection(message.id, checked)
+                        }
+                        onClick={(event) => event.stopPropagation()}
+                        aria-label={`Selecionar mensagem ${message.id}`}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          deleteMessage(message.id);
+                        }}
+                        aria-label={`Excluir mensagem ${message.id}`}
+                      >
+                        <Trash2 className="size-3.5 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
