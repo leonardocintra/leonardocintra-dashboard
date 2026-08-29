@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy } from "lucide-react";
+import { Copy, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,6 +29,8 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
   );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [improving, setImproving] = useState(false);
+  const [improveError, setImproveError] = useState<string | null>(null);
 
   const fixedLink = "https://aviseiprecobom.com.br";
 
@@ -77,7 +79,10 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
         throw new Error(data.error ?? `Upload failed (${response.status})`);
       }
 
-      const data = (await response.json()) as { imageUrl: string, imageName: string };
+      const data = (await response.json()) as {
+        imageUrl: string;
+        imageName: string;
+      };
       setImageUrl(data.imageUrl);
       setImageName(data.imageName);
     } catch (error) {
@@ -133,6 +138,44 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
       const messageText =
         error instanceof Error ? error.message : String(error);
       setUploadError(messageText);
+    }
+  };
+
+  const handleImprove = async () => {
+    if (improving) {
+      return;
+    }
+    if (message.trim() === "") {
+      return;
+    }
+
+    setImproving(true);
+    setImproveError(null);
+    try {
+      const response = await fetch(
+        `/api/mensagem-externa/${mensagem.id}/melhorar`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        },
+      );
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(data.error ?? `Improve failed (${response.status})`);
+      }
+
+      const data = (await response.json()) as { message: string };
+      setMessage(data.message);
+    } catch (error) {
+      const messageText =
+        error instanceof Error ? error.message : String(error);
+      setImproveError(messageText);
+    } finally {
+      setImproving(false);
     }
   };
 
@@ -235,6 +278,7 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
             id="message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            disabled={improving}
             rows={12}
             className="w-full rounded-3xl border border-transparent bg-input/50 px-3 py-2 text-sm outline-none transition-[color,box-shadow,background-color] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
           />
@@ -246,6 +290,7 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
               <ul className="space-y-1">
                 {links.map((url, index) => (
                   <li
+                    // biome-ignore lint/suspicious/noArrayIndexKey: O Palmeira nao tem mundial entao deixa assim
                     key={index}
                     className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                   >
@@ -292,8 +337,18 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
             Cancelar
           </Button>
           <Button
+            variant="secondary"
+            onClick={handleImprove}
+            disabled={improving || message.trim() === ""}
+          >
+            <Sparkles />
+            {improving ? "Melhorando..." : "Melhorar com IA"}
+          </Button>
+          <Button
             onClick={handleSave}
-            disabled={saving || uploading || !!uploadError || !imageUrl}
+            disabled={
+              saving || uploading || !!uploadError || !imageUrl || improving
+            }
           >
             {saving ? "Salvando..." : "Salvar"}
           </Button>
@@ -306,6 +361,9 @@ export function MensagemForm({ mensagem }: { mensagem: MensagemExterna }) {
             {deleting ? "Deletando..." : "Deletar"}
           </Button>
         </div>
+        {improveError && (
+          <p className="text-xs text-destructive">{improveError}</p>
+        )}
 
         <div className="space-y-2 pt-2">
           <span className="text-sm font-medium text-muted-foreground">

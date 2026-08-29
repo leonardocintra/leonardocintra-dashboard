@@ -121,6 +121,46 @@ export async function updateMensagemExterna(
   return (await response.json()) as MensagemExterna;
 }
 
+export async function improveMensagemExterna(message: string): Promise<string> {
+  const baseUrl = process.env.LEONARDO_API_URL;
+
+  if (!baseUrl) {
+    throw new Error(
+      "LEONARDO_API_URL environment variable is not set. Configure it in .env.local",
+    );
+  }
+
+  const url = `${baseUrl.replace(/\/+$/, "")}/afiliados/ia/melhorar-mensagem`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify({ message }),
+      signal: AbortSignal.timeout(60_000),
+    });
+
+    // Only 201 is success — any other status is an error
+    if (response.status !== 201) {
+      throw new Error(
+        `Upstream API returned ${response.status}: ${response.statusText}`,
+      );
+    }
+
+    const data = (await response.json()) as { message: string };
+    return data.message;
+  } catch (error) {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      throw new Error("Upstream API timed out after 60s");
+    }
+    throw error;
+  }
+}
+
 export async function deleteMensagemExterna(
   id: number | string,
 ): Promise<void> {
