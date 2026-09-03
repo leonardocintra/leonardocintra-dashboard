@@ -171,7 +171,7 @@ export function MensagemExternaTable({
                       />
                       <Button
                         variant="ghost"
-                        size="icon-lg"
+                        size="lg"
                         onClick={(event) => {
                           event.stopPropagation();
                           deleteMessage(message.id);
