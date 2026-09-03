@@ -178,7 +178,6 @@ export function MensagemExternaTable({
                         }}
                         aria-label={`Excluir mensagem ${message.id}`}
                       >
-                        Excluir {" "}
                         <Trash2 className="size-3.5 text-destructive" />
                       </Button>
                     </div>
