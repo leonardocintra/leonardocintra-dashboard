@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,6 +19,19 @@ import type { MensagemExterna } from "@/lib/api/mensagem-externa";
 import { cn } from "@/lib/utils";
 
 const ROW_FADE_MS = 300;
+
+const ORIGEM_IMAGE_BY_VALUE: Record<string, string> = {
+  AMAZON: "/AMAZON.jpg",
+  MERCADO_LIVRE: "/MERCADO_LIVRE.jpeg",
+  SHOPEE: "/SHOPEE.jpg",
+  NAO_IDENTIFICADA: "/NAO_IDENTIFICADA.jpg",
+};
+
+function getOrigemImage(origem?: string | null) {
+  if (!origem) return null;
+
+  return ORIGEM_IMAGE_BY_VALUE[origem.trim().toUpperCase()] ?? null;
+}
 
 export function MensagemExternaTable({
   messages,
@@ -119,10 +133,11 @@ export function MensagemExternaTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-20">ID</TableHead>
-              <TableHead className="w-36">Data</TableHead>
+              <TableHead className="w-44">Data</TableHead>
               <TableHead className="w-[calc(100%-16rem)] overflow-hidden">
                 Mensagem
               </TableHead>
+              <TableHead className="w-44">Origem</TableHead>
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
@@ -137,31 +152,49 @@ export function MensagemExternaTable({
                 </TableCell>
               </TableRow>
             ) : (
-              messages.map((message) => (
-                <TableRow
-                  data-message-id={`message-id-${message.id}`}
-                  key={message.id}
-                  className={cn(
-                    "cursor-pointer transition-opacity duration-300",
-                    removingIds.has(message.id) && "opacity-0",
-                  )}
-                  onClick={() =>
-                    router.push(`/dashboard/mensagens/${message.id}`)
-                  }
-                >
-                  <TableCell className="max-w-0 truncate font-medium">
-                    {message.id}
-                  </TableCell>
-                  <TableCell className="max-w-0 truncate">
-                    {new Date(message.createdAt).toLocaleString("pt-BR")}
-                  </TableCell>
-                  <TableCell className="max-w-0">
-                    <span className="block whitespace-pre-line">
-                      {message.message}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
+              messages.map((message) => {
+                const origemImage = getOrigemImage(message.origem);
+
+                return (
+                  <TableRow
+                    data-message-id={`message-id-${message.id}`}
+                    key={message.id}
+                    className={cn(
+                      "cursor-pointer transition-opacity duration-300",
+                      removingIds.has(message.id) && "opacity-0",
+                    )}
+                    onClick={() =>
+                      router.push(`/dashboard/mensagens/${message.id}`)
+                    }
+                  >
+                    <TableCell className="max-w-0 truncate font-medium">
+                      {message.id}
+                    </TableCell>
+                    <TableCell className="max-w-0 truncate">
+                      {new Date(message.createdAt).toLocaleString("pt-BR")}
+                    </TableCell>
+                    <TableCell className="max-w-0">
+                      <span className="block whitespace-pre-line">
+                        {message.message}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {origemImage ? (
+                        <div className="flex items-center justify-center">
+                          <Image
+                            src={origemImage}
+                            alt={`Origem ${message.origem}`}
+                            width={180}
+                            height={82}
+                            className="h-10 w-auto object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <span>{message.origem}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
                       <Checkbox
                         checked={selectedIds.has(message.id)}
                         onCheckedChange={(checked) =>
@@ -184,7 +217,8 @@ export function MensagemExternaTable({
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>
