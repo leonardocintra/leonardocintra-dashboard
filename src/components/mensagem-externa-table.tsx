@@ -158,6 +158,7 @@ export function MensagemExternaTable({
                 return (
                   <TableRow
                     data-message-id={`message-id-${message.id}`}
+                    data-message-origin={`message-origin-${message.origem}`}
                     key={message.id}
                     className={cn(
                       "cursor-pointer transition-opacity duration-300",
