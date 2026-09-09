@@ -186,7 +186,7 @@ export function MensagemExternaTable({
                             alt={`Origem ${message.origem}`}
                             width={180}
                             height={82}
-                            className="h-10 w-auto object-contain"
+                            className="h-20 w-auto object-contain rounded-3xl shadow-2xl"
                           />
                         </div>
                       ) : (
