@@ -139,6 +139,7 @@ export function MensagemExternaTable({
             ) : (
               messages.map((message) => (
                 <TableRow
+                  data-message-id={`message-id-${message.id}`}
                   key={message.id}
                   className={cn(
                     "cursor-pointer transition-opacity duration-300",
